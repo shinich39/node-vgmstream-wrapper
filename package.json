@@ -1,0 +1,30 @@
+{
+  "name": "node-vgmstream-wrapper",
+  "version": "1.0.0",
+  "description": "Javascript module builder.",
+  "main": "./dist/node-vgmstream-wrapper.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/node-vgmstream-wrapper.mjs",
+      "require": "./dist/node-vgmstream-wrapper.cjs"
+    }
+  },
+  "type": "module",
+  "scripts": {
+    "test": "npm run pretty && npm run build && node test/index.js",
+    "build": "rollup --config rollup.config.js",
+    "pretty": "prettier index.js --write --config prettier.config.js"
+  },
+  "keywords": [
+    "javascript"
+  ],
+  "author": "shinich39 <shinich39@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^28.0.2",
+    "@rollup/plugin-node-resolve": "^16.0.0",
+    "@rollup/plugin-terser": "^0.4.4",
+    "prettier": "^3.4.2",
+    "rollup": "^4.29.1"
+  }
+}
