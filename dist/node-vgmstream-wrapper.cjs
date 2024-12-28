@@ -42,7 +42,7 @@ function exec(...args) {
   });
 }
 
-async function extract(filePath) {
+async function decode(filePath) {
   if (fs.existsSync("./tmp")) {
     fs.rmSync("./tmp", { recursive: true });
   }
@@ -65,4 +65,4 @@ async function extract(filePath) {
   });
 }
 
-exports.extract = extract;
+exports.decode = decode;
