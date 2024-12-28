@@ -19,7 +19,7 @@ const CLI_PATHS = {
   win32: path.join(__dirname, "../src/vgmstream-win64/vgmstream-cli.exe"),
 };
 
-const CACHE_PATH = path.join(process.cwd(), ".vgmstream");
+const CACHE_PATH = path.join(__dirname, "../.vgmstream");
 
 function exec(...args) {
   return new Promise(function (resolve, reject) {
