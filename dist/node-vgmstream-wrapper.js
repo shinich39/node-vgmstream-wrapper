@@ -1,20 +1,25 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('node:os'), require('node:child_process'), require('node:fs'), require('node:path')) :
-  typeof define === 'function' && define.amd ? define(['exports', 'node:os', 'node:child_process', 'node:fs', 'node:path'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.nodeVgmstreamWrapper = {}, global.os, global.node_child_process, global.fs, global.path));
-})(this, (function (exports, os, node_child_process, fs, path) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('node:os'), require('node:child_process'), require('node:fs'), require('node:path'), require('node:url')) :
+  typeof define === 'function' && define.amd ? define(['exports', 'node:os', 'node:child_process', 'node:fs', 'node:path', 'node:url'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.nodeVgmstreamWrapper = {}, global.os, global.node_child_process, global.fs, global.path, global.node_url));
+})(this, (function (exports, os, node_child_process, fs, path, node_url) { 'use strict';
+
+  var _documentCurrentScript = typeof document !== 'undefined' ? document.currentScript : null;
+  const __dirname = path.dirname(node_url.fileURLToPath((typeof document === 'undefined' && typeof location === 'undefined' ? require('u' + 'rl').pathToFileURL(__filename).href : typeof document === 'undefined' ? location.href : (_documentCurrentScript && _documentCurrentScript.tagName.toUpperCase() === 'SCRIPT' && _documentCurrentScript.src || new URL('node-vgmstream-wrapper.js', document.baseURI).href))));
 
   const CLI_PATHS = {
-    linux: "src/vgmstream-win/vgmstream-cli",
-    mac: "src/vgmstream-win/vgmstream-cli",
-    wasm: "src/vgmstream-win/vgmstream-cli.wasm",
-    win: "src/vgmstream-win/vgmstream-cli.exe",
-    win64: "src/vgmstream-win64/vgmstream-cli.exe",
+    linux: path.join(__dirname, "../src/vgmstream-linux-cli/vgmstream-cli"),
+    mac: path.join(__dirname, "../src/vgmstream-mac-cli/vgmstream-cli"),
+    wasm: path.join(__dirname, "../src/vgmstream-wasm/vgmstream-cli.wasm"),
+    win: path.join(__dirname, "../src/vgmstream-win/vgmstream-cli.exe"),
+    win64: path.join(__dirname, "../src/vgmstream-win64/vgmstream-cli.exe"),
 
-    linux: "src/vgmstream-win/vgmstream-cli",
-    darwin: "src/vgmstream-win/vgmstream-cli",
-    win32: "src/vgmstream-win64/vgmstream-cli.exe",
+    linux: path.join(__dirname, "../src/vgmstream-linux-cli/vgmstream-cli"),
+    darwin: path.join(__dirname, "../src/vgmstream-mac-cli/vgmstream-cli"),
+    win32: path.join(__dirname, "../src/vgmstream-win64/vgmstream-cli.exe"),
   };
+
+  const CACHE_PATH = path.join(process.cwd(), ".vgmstream");
 
   function exec(...args) {
     return new Promise(function (resolve, reject) {
@@ -42,10 +47,10 @@
   }
 
   async function decode(filePath) {
-    if (fs.existsSync("./tmp")) {
-      fs.rmSync("./tmp", { recursive: true });
+    if (fs.existsSync(CACHE_PATH)) {
+      fs.rmSync(CACHE_PATH, { recursive: true });
     }
-    fs.mkdirSync("./tmp", { recursive: true });
+    fs.mkdirSync(CACHE_PATH, { recursive: true });
 
     const cli = CLI_PATHS[os.platform()];
     await exec(
@@ -53,13 +58,13 @@
       "-S",
       "0",
       "-o",
-      "./tmp/?n.wav",
-      filePath
+      path.join(CACHE_PATH, "?n.wav"),
+      path.resolve(filePath)
     );
-    return fs.readdirSync("./tmp").map((item) => {
+    return fs.readdirSync(CACHE_PATH).map((item) => {
       return {
         filename: item,
-        buffer: fs.readFileSync(path.join("./tmp", item)),
+        buffer: fs.readFileSync(path.join(CACHE_PATH, item)),
       };
     });
   }

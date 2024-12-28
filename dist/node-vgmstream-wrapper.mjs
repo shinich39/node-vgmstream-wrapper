@@ -2,18 +2,23 @@ import os from 'node:os';
 import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const CLI_PATHS = {
-  linux: "src/vgmstream-win/vgmstream-cli",
-  mac: "src/vgmstream-win/vgmstream-cli",
-  wasm: "src/vgmstream-win/vgmstream-cli.wasm",
-  win: "src/vgmstream-win/vgmstream-cli.exe",
-  win64: "src/vgmstream-win64/vgmstream-cli.exe",
+  linux: path.join(__dirname, "../src/vgmstream-linux-cli/vgmstream-cli"),
+  mac: path.join(__dirname, "../src/vgmstream-mac-cli/vgmstream-cli"),
+  wasm: path.join(__dirname, "../src/vgmstream-wasm/vgmstream-cli.wasm"),
+  win: path.join(__dirname, "../src/vgmstream-win/vgmstream-cli.exe"),
+  win64: path.join(__dirname, "../src/vgmstream-win64/vgmstream-cli.exe"),
 
-  linux: "src/vgmstream-win/vgmstream-cli",
-  darwin: "src/vgmstream-win/vgmstream-cli",
-  win32: "src/vgmstream-win64/vgmstream-cli.exe",
+  linux: path.join(__dirname, "../src/vgmstream-linux-cli/vgmstream-cli"),
+  darwin: path.join(__dirname, "../src/vgmstream-mac-cli/vgmstream-cli"),
+  win32: path.join(__dirname, "../src/vgmstream-win64/vgmstream-cli.exe"),
 };
+
+const CACHE_PATH = path.join(process.cwd(), ".vgmstream");
 
 function exec(...args) {
   return new Promise(function (resolve, reject) {
@@ -41,10 +46,10 @@ function exec(...args) {
 }
 
 async function decode(filePath) {
-  if (fs.existsSync("./tmp")) {
-    fs.rmSync("./tmp", { recursive: true });
+  if (fs.existsSync(CACHE_PATH)) {
+    fs.rmSync(CACHE_PATH, { recursive: true });
   }
-  fs.mkdirSync("./tmp", { recursive: true });
+  fs.mkdirSync(CACHE_PATH, { recursive: true });
 
   const cli = CLI_PATHS[os.platform()];
   await exec(
@@ -52,13 +57,13 @@ async function decode(filePath) {
     "-S",
     "0",
     "-o",
-    "./tmp/?n.wav",
-    filePath
+    path.join(CACHE_PATH, "?n.wav"),
+    path.resolve(filePath)
   );
-  return fs.readdirSync("./tmp").map((item) => {
+  return fs.readdirSync(CACHE_PATH).map((item) => {
     return {
       filename: item,
-      buffer: fs.readFileSync(path.join("./tmp", item)),
+      buffer: fs.readFileSync(path.join(CACHE_PATH, item)),
     };
   });
 }

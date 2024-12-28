@@ -1,5 +1,5 @@
-tmp/
 *.acb
+.vgmstream
 
 # Created by https://www.toptal.com/developers/gitignore/api/node,react,reactnative,android,java,swift,objective-c
 # Edit at https://www.toptal.com/developers/gitignore?templates=node,react,reactnative,android,java,swift,objective-c
